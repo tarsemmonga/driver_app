@@ -1,0 +1,276 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" type="text/css" href="{% static 'map/style.css' %}">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <title>Driver App</title>
+
+  <style>
+/* superuser is this : username:  batman pass: test0987
+
+  /*
+  Map settings*/
+  #map {
+    height: 575px;
+    width: 90%;
+    margin: auto;
+  }
+
+  </style>
+</head>
+<body id="index">
+
+  <!-- Logout button if user is logged in -->
+  {% if user.is_authenticated %}
+  <a id="inlog" href="{% url 'map:logout' %}">LOGOUT</a>
+  {% endif %}
+
+  <div style="margin-left:120px; margin-top:10px; margin-bottom:5px;" id="floating-panel">
+    <input id="address" type="textbox" value="Sydney, NSW">
+    <input id="submit" type="button" value="Geocode">
+  </div>
+  <div id="map"> </div>
+
+
+  <script type="text/JavaScript">
+
+
+	var map;
+
+	function initMap(){
+		var Newinfowindow = new google.maps.InfoWindow();
+		var newmarker;
+		var infowindow = new google.maps.InfoWindow();
+
+		//get random number for coords
+		function genRand(min, max, decimalPlaces) {
+			var rand = Math.random()*(max-min) + min;
+			var power = Math.pow(10, decimalPlaces);
+			return Math.floor(rand*power) / power;
+		}
+
+		var infoWindow = new google.maps.InfoWindow({
+			content: "hi"
+		});
+	    
+		//infoWindow for driver
+
+		//sample coords
+		var myLatLng = {lat: 49.029089 , lng: -122.285471};
+		//lat: 49.029089 , lng: -122.285471
+
+		//map display options
+		var options = {
+			zoom: 15,
+			center: {lat:49.0504, lng: -122.3045}
+		}
+		
+		// new map
+		var map = new google.maps.Map(document.getElementById('map'), options);
+
+		//Array of markers
+		var markers = [
+		{
+			//  coords:{lat:49.029053,lng: -122.285431},
+			iconImage:'http://maps.google.com/mapfiles/kml/shapes/cabs.png',
+			content:'<h1>Driver One</h1>'
+		},
+		];
+
+		//loop through markers to call them one at a time
+		for(var i=0; i<markers.length; i++){
+			addMarker(markers[i]);
+		}
+
+		//function 'addMarker' that passes in values instead of hard coding
+		//dynamic coords e.g.
+		//addMarker function
+		function addMarker(props){
+			var marker = new google.maps.Marker({
+				//passes in coords
+				position:props.coords,
+				map:map,
+				//change the icons/Marker
+				//icon: props.iconImage
+			});
+			//check for customicon
+
+			//check if content put inspect
+			if(props.content){
+			//info box for hovering icon
+			}
+
+			//listen for infoWindow
+			//event listener
+			marker.addListener('click', function(){ //listen for click / function runs when it happens
+				infoWindow.open(map, marker);
+			});
+
+		}
+
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				var pos = {
+					lat: position.coords.latitude,
+					lng: position.coords.longitude
+				};
+				
+				// set the cookies for coordinates
+				document.cookie = "lat=" + position.coords.latitude;
+				document.cookie = "long=" + position.coords.longitude;
+					
+				// user at geolocation
+				newmarker = new google.maps.Marker({
+					position: pos,
+					map:map,
+					content: '',
+					title: '{{ user.username }}',
+					icon: personImage
+				});
+				
+				google.maps.event.addListener(newmarker, 'click', (function(newmarker){
+					return function(){
+						// set content to show username and link to their profile
+						infowindow.setContent("<a href='{% url 'map:profile' user.id %}'><b>{{ user.username }}</b></a>");
+						infowindow.open(map, newmarker);
+					}
+				})(newmarker));
+				
+				map.setCenter(pos);
+				map.setZoom(11);
+				
+				
+				
+				// only show markers if person using app is not a driver
+				{% if not request.session.isdriver %}
+				
+				{% for user in info %}
+				{% with uinfo=user.userinfo_set.all|first %}
+				
+				// only show users on map that are drivers
+				{% if uinfo.is_driver is True %}
+
+				// show drivers on map that are logged in
+				{% if user.is_authenticated %}
+		
+				var position = new google.maps.LatLng({{ uinfo.cur_lat }}, {{ uinfo.cur_long }});
+				
+				newmarker = new google.maps.Marker({
+					position: position,
+					map:map,
+					content: '{{ user.email }}',
+					title: '{{ user.username }}',
+					icon: carImage
+				});
+
+				google.maps.event.addListener(newmarker, 'click', (function(newmarker){
+					return function(){
+						// set content to show username and link to their profile
+						infowindow.setContent("<a href='{% url 'map:profile' user.id %}'><b>{{ user.username }}</b></a>");
+						infowindow.open(map, newmarker);
+					}
+				})(newmarker));
+				
+				// THIS RANDOMLY PLACES ALL DRIVER USERS IN THE DATABASE THAT ARENT LOGGED IN ON THE MAP AS AN EXAMPLE
+				// IN REAL PRODUCTION, THIS WOULD BE DELETED SO IF DRIVERS ARENT LOGGED IN THEY DONT SHOW ON MAP
+				{% else %}
+				
+				var position = new google.maps.LatLng(pos.lat + genRand(.001,.009, 4), pos.lng-genRand(.002,.009, 4));
+				
+				newmarker = new google.maps.Marker({
+					position: position,
+					map:map,
+					content: '{{ user.email }}',
+					title: '{{ user.username }}',
+					icon: carImage
+				});
+
+				google.maps.event.addListener(newmarker, 'click', (function(newmarker){
+					return function(){
+						// set content to show username and link to their profile
+						infowindow.setContent("<a href='{% url 'map:profile' user.id %}'><b>{{ user.username }}</b></a>");
+						infowindow.open(map, newmarker);
+					}
+				})(newmarker));
+
+				{% endif %}
+				{% endif %}
+				{% endwith %}
+				{% endfor %}
+				
+				// only show drivers the users that want to be picked up on map
+				{% else %}
+				
+				{% for user in info %}
+				{% with uinfo=user.userinfo_set.all|first %}
+				
+				// only show users on map that aren't drivers and want to picked up by the driver and are logged in
+				{% if uinfo.is_driver is False and uinfo.driver_id == request.session.id and user.is_authenticated %}
+				
+				var position = new google.maps.LatLng({{ uinfo.cur_lat }}, {{ uinfo.cur_long }});
+				
+				newmarker = new google.maps.Marker({
+					position: position,
+					map:map,
+					content: '',
+					title: '{{ user.username }}',
+					icon: personImage
+				});
+
+				
+				// set content to show username and link to their profile
+				infowindow.setContent("<a href='{% url 'map:profile' user.id %}'><b>{{ user.username }}</b></a><br><b>{{ user.first_name }} has requested a pickup!</b>");
+				infowindow.open(map, newmarker);
+				
+				
+				{% endif %}
+				{% endwith %}
+				{% endfor %}
+				{% endif %}
+			
+			}, function() {
+				handleLocationError(true, infoWindow, map.getCenter());
+			});
+		} else {
+			// Browser doesn't support Geolocation
+			handleLocationError(false, infoWindow, map.getCenter());
+		}
+
+		function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+			infoWindow.setPosition(pos);
+			infoWindow.setContent(browserHasGeolocation ?
+			'Error: The Geolocation service failed.' :
+			'Error: Your browser doesn\'t support geolocation.');
+			infoWindow.open(map);
+		}
+
+		var carImage = {
+			url: 'https://static.thenounproject.com/png/331565-200.png',
+			scaledSize: new google.maps.Size(50, 50),
+			origin: new google.maps.Point(0,0),
+			anchor: new google.maps.Point(0, 0)
+		}
+		
+		var personImage = {
+			url: 'https://static.thenounproject.com/png/331569-200.png',
+			scaledSize: new google.maps.Size(50, 50),
+			origin: new google.maps.Point(0,0),
+			anchor: new google.maps.Point(0, 0)
+		}
+		
+	}
+	
+	// update coordinates for users every 40 seconds
+	setTimeout(function(){ window.location.href = "{% url 'map:update_coords' %}"; }, 40000);
+	
+</script>
+
+<script async defer src="//maps.googleapis.com/maps/api/js?key=AIzaSyCNKF-8h5htY6WIGg5czAuhYodWEE8pU3w&callback=initMap"></script>
+</body>
+</html>

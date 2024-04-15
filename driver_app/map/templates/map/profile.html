@@ -1,0 +1,188 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="profile" content="User Profile">
+		
+        <title>Driver App Profile</title>
+		
+		<!-- Mobile Specific Meta
+		================================================== -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<!--
+		Google Font
+		=========================== -->   
+		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+		<!-- Font Awesome Symbols -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		
+		<!-- CSS
+		================================================== -->
+		<link rel="stylesheet" type="text/css" href="{% static 'map/style.css' %}">
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		
+		<!-- Validate form -->
+		<script type="text/javascript">
+			function validate(form){
+				fail = valEmail(form.email.value);
+				fail += valPass(form.password1.value, form.password2.value);
+				if (fail == "") 
+					return true;
+				else { 
+					alert(fail); 
+					return false;
+				}
+			}
+			
+			// for browsers not supporting input type email
+			// ensure email formatted properly with at least an @ and . symbol
+			function valEmail(val){
+				// if nothing entered, still valid
+				if (val == "") return "";
+				if (!(/[@]/.test(val))) {
+					return "Emails must contain the '@' symbol.\n";
+				}
+				if (!(/[.]/.test(val))){
+					return "Emails must specify the domain.\n";
+				}
+				return "";
+			}
+			
+			// ensure password contains at least 1 special character, 1 capital and lower case, and 1 number and is over 6 characters
+			function valPass(val1, val2){
+				// if nothing entered, still valid
+				if (val1 == "" && val2 == "") return "";
+				if (!(/[!@#$%]/.test(val1))){
+					return "Passwords must have at least 1 special character of !, @, #, $, or %.\n";
+				}
+				if (!(/[a-z]/.test(val1))){
+					return "Passwords must have at least 1 lower case letter.\n";
+				}
+				if (!(/[A-Z]/.test(val1))){
+					return "Passwords must have at least 1 upper case letter.\n";
+				}
+				if (!(/[0-9]/.test(val1))){
+					return "Passwords must have at least 1 number.\n";
+				}
+				if (val1.length < 7){
+					return "Passwords must be over 6 characters in length.\n";
+				}
+				if (val1 !== val2){
+					return "Passwords must match in both fields.\n"
+				}
+				return "";
+			}
+			
+		</script>
+	
+    </head>
+	
+    <body id="profile">
+	    
+		<div class="container-fluid">
+			<div class="row">
+				<a href="{% url 'map:index' %}"><i class="fa fa-times fa-3x" style="font-size:60px;color:red;"></i></a>
+				<!-- Logout button if user is logged in -->
+				{% if user.is_authenticated %}
+				<a class="logout" href="{% url 'map:logout' %}">LOGOUT</a>
+				{% endif %}
+				<div id="left" class="col-sm-3 col-xs-12 text-center">
+					<!-- User Information -->
+					<img alt="Profile Picture" src="{{ info.image.url }}" width="200" height="200">
+					<h2>{{ user.username }}</h2>
+					<h3>{{ user.first_name }}</h3>
+					<h3>{{ user.last_name }}</h3>
+					<!-- if on own profile, allow for changing changing info --> 
+					{% if request.session.id == user.id %}
+					<p style="margin-top:25px;" class="bigger"><u>Change Information</u></p>
+					<form action="{% url 'map:profile' user.id %}" method="post" enctype="multipart/form-data" onsubmit="return validate(this)">
+						{% csrf_token %}
+						<p class="bigger">New Profile Picture</p>
+						<input style="margin:auto;" type="file" name="profpic"><br>
+						<input type="text" name="username" placeholder="New Username" maxlength="50"><br>
+						<input type="text" name="email" placeholder="New Email" maxlength="200"><br>
+						<p class="bigger">Change Password</p>
+						<input type="password" name="password1" placeholder="New Password" maxlength="50"><br>
+						<input type="password" name="password2" placeholder="Reenter Password" maxlength="50"><br>
+						<p class="bigger">Change Bio</p>
+						<textarea name="bio" rows="20" cols="20" maxlength="1000"></textarea>
+						<br>
+						<input type="submit" name="Update" value="Update">
+					</form>
+					{% endif %}
+					
+				</div>
+				<div id="right" class="col-sm-9 col-xs-12">
+					<div style="text-align:center;margin-top:70px;">
+						<!-- Complete the pickup for this driver if they've been requested -->
+						{% if info.is_driver and request.session.id != user.id and request.session.driverid == user.id %}
+						<a href="{% url 'map:complete' %}" id="book" >Complete Pickup!</a>
+						<p>Make sure to leave a review first!</p>
+						<!-- Request for pickup if not on own account and is driver -->
+						{% elif info.is_driver and request.session.id != user.id %}
+						<a href="{% url 'map:book' user.id %}" id="book" >Request Pickup!</a>
+						{% endif %}
+					</div>
+					<!-- Show user bio if they have one -->
+					<div class="container" id="bio">
+						<p>{{ info.bio }}</p>
+					</div>
+					
+					<h2 class="text-center">Reviews</h2>
+					<!-- Loop over reviews for this user and display them -->
+					{% for review in user.review_set.all %}
+						<h4 class="review-text">{{review.author}}</h3>
+						<p class="review-text">rating: {{review.rating}}</p>
+						<p class="review-text">{{review.review_text}}</p>
+					{% endfor %}
+					
+					<!-- section to write review -->
+					<!-- Don't allow to write review on own account	-->
+					{% if request.session.id != user.id %}
+					<h3>Write a Review</h3>
+					<hr>
+					<form action="{% url 'map:profile' user.id %}" method="post" >
+						{% csrf_token %}
+						<textarea name="revtext" style="margin-top: 5px;" rows="10" cols="60" maxlength="500" required ></textarea>
+						<br>
+						<label>  
+                            Rating:                         
+                            <input type="radio" name="rating" value="1" required >1
+                            <input type="radio" name="rating" value="2" required >2
+							<input type="radio" name="rating" value="3" required >3
+							<input type="radio" name="rating" value="4" required >4
+							<input type="radio" name="rating" value="5" required >5
+						</label> 
+						<input type="submit" name="Review" value="Review" >
+					</form>
+					{% endif %}
+					
+				</div>
+			</div>
+		</div>
+        
+		
+		<!-- end Footer Area
+		========================================== -->
+		
+		<!-- 
+		Essential Scripts
+		=====================================-->
+		
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		
+
+    </body>
+</html>

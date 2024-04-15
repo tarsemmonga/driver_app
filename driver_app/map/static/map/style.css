@@ -1,0 +1,150 @@
+
+body, body#profile, body#register {
+	background-color: #e8eff9;
+	font-family: 'Roboto', sans-serif;
+}
+
+#profile div.row > a:first-child {
+	z-index: 5;
+	position: fixed;
+	top: 15px;
+    left: 20px;
+}
+
+body a.logout {
+	z-index: 5;
+	border: 2px solid #0e397c;
+    padding: 5px;
+    color: white;
+    background: #0e397c;
+	text-decoration: none;
+    border-radius: 5px;
+    position: fixed;
+    right: 15px;
+    top: 15px;
+	transition: .2s;
+	webkit-transition: .2s;
+	-o-transition: .2s;
+}
+
+body a.logout:hover {
+	color: black;
+	background-color: white;
+	text-decoration: none;
+}
+
+#index a#inlog {
+	z-index: 5;
+	border: 2px solid #0e397c;
+    padding: 5px;
+    color: white;
+    background: #0e397c;
+    border-radius: 5px;
+	margin-left: 120px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	text-decoration: none;
+	transition: .2s;
+	webkit-transition: .2s;
+	-o-transition: .2s;
+}
+
+#index a#inlog:hover {
+	color: black;
+	background-color: white;
+	text-decoration: none;
+}
+
+#profile div.row div {
+	margin-top: 20px;
+}
+
+#profile div.row div h4 {
+	text-decoration: underline;
+    margin-top: 20px;
+    border-top: 1px solid black;
+    padding-top: 8px;
+	padding-left: 20px;
+	font-size: 1.6em;
+}
+
+#profile div.row div h3 {
+	margin-top: 40px;
+}
+
+#profile div.row div p {
+	font-size: 1.15em;
+}
+
+#profile div.row div#bio p {
+	margin-right: 50px;
+}
+
+#profile div.row div#right div > a {
+	border: 1px solid #0e397c;
+    border-radius: 25px;
+    padding: 10px 15px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-size: 2em;
+}
+
+#profile div.row div#right div > p {
+	margin-top: 11px;
+}
+
+#profile div.row div#left h2 {
+	font-size: 2.6em;
+}
+
+#profile div.row div#left .bigger {
+	margin-top: 25px;
+    text-decoration: underline;
+}
+
+#register h1 {
+	margin-left: 70px;
+    margin-bottom: 20px;
+}
+
+#register div label {
+	margin-top: 15px;
+    margin-right: 10px;
+}
+
+#register div input#regsub {
+	margin-left: 100px;
+    margin-top: 15px;
+}
+
+#register div form {
+	margin-left: 40px;
+}
+
+@media only screen and (max-width: 375px) {
+	
+	#index a#inlog {
+		z-index: 5;
+		float: left;
+		border: 2px solid #0e397c;
+		padding: 5px;
+		color: white;
+		background: #0e397c;
+		border-radius: 5px;
+		margin-left: 20px;
+		margin-top: 5px;
+		margin-bottom: 10px;
+		transition: .2s;
+		webkit-transition: .2s;
+		-o-transition: .2s;
+	}
+
+	#index a#inlog:hover {
+		color: black;
+		background-color: white;
+	}
+}
+
+

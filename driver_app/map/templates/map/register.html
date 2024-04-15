@@ -1,0 +1,68 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="profile" content="User Profile">
+		
+        <title>Sign Up</title>
+		
+		<!-- Mobile Specific Meta
+		================================================== -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<!--
+		Google Font
+		=========================== -->   
+		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+		
+		<!-- CSS
+		================================================== -->
+		<link rel="stylesheet" type="text/css" href="{% static 'map/style.css' %}">
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		
+	
+    </head>
+	
+    <body id="register">
+	    
+		<h1>Sign Up</h1>
+		<div class="container-fluid">
+			<!-- Show errors in fields if there are any -->
+			{% if errors %}
+				{% for key, value in errors.items %}
+					<p class="errormsg">{{ value }}</p>
+				{% endfor %}
+			{% endif %}
+			<!-- action kept blank since same view for the url is both serving form and getting post -->
+			<form action="" method="post">
+				{% csrf_token %}
+				{{ form }}
+				<br>
+				<input id="regsub" type="submit" value="Submit">
+			</form>
+		</div>
+        
+		
+		<!-- end Footer Area
+		========================================== -->
+		
+		<!-- 
+		Essential Scripts
+		=====================================-->
+		
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		
+
+    </body>
+</html>
