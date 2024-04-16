@@ -16,9 +16,7 @@ Users can also go on their own profiles to update their information and upload a
 
 **This project works best on mobile devices or other systems with geolocation services.**
 
-**A running version of this project can be found here: https://8de0235c.ngrok.io! If the ngrok session isn't up due to automatic timeout, it may also be accessed through http://172.30.14.94:8000 while a VPN session into UFV is active. By accessing the app this way however, most of the app will be unavailable since Google Maps requires HTTPS.**
 
-**The running instances for this project that were created with the yaml and env files found in the "projectyaml" directory can be found on Openstack as "brandon-deploy-server" and "brandon-jenkins-server".**
    
 ## Project Responsibilities
 
